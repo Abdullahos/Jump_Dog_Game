@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samoray</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <canvas id="canvas1"></canvas>
+    <img id="playerImage" src="player.png">
+    <img id=backgroundImage src="background_single.png">
+    <img id="enemyImage" src="enemy_1.png">
+    <img id="gameOver" src="gameOver.png">
+
+
+    <script src="script.js"></script>
+    <script>
+    var http = require('http');
+    var fs = require('fs');
+    var path = require('path');
+
+    http.createServer(function (request, response) {
+        console.log('request ', request.url);
+
+        var filePath = '.' + request.url;
+        if (filePath == './') {
+            filePath = './index.html';
+        }
+
+        var extname = String(path.extname(filePath)).toLowerCase();
+        var mimeTypes = {
+            '.html': 'text/html',
+            '.js': 'text/javascript',
+            '.css': 'text/css',
+            '.json': 'application/json',
+            '.png': 'image/png',
+            '.jpeg': 'image/jpeg',
+            '.jpg': 'image/jpg',
+            '.gif': 'image/gif',
+            '.svg': 'image/svg+xml',
+            '.wav': 'audio/wav',
+            '.mp4': 'video/mp4',
+            '.woff': 'application/font-woff',
+            '.ttf': 'application/font-ttf',
+            '.eot': 'application/vnd.ms-fontobject',
+            '.otf': 'application/font-otf',
+            '.wasm': 'application/wasm'
+        };
+
+        var contentType = mimeTypes[extname] || 'application/octet-stream';
+
+        fs.readFile(filePath, function(error, content) {
+            if (error) {
+                if(error.code == 'ENOENT') {
+                    fs.readFile('./404.html', function(error, content) {
+                        response.writeHead(404, { 'Content-Type': 'text/html' });
+                        response.end(content, 'utf-8');
+                    });
+                }
+                else {
+                    response.writeHead(500);
+                    response.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
+                }
+            }
+            else {
+                response.writeHead(200, { 'Content-Type': contentType });
+                response.end(content, 'utf-8');
+            }
+        });
+
+    }).listen(8125);
+    console.log('Server running at http://127.0.0.1:8125/');
+    </script>
+  </body>
+</html>
